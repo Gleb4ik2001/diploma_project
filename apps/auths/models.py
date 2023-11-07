@@ -3,18 +3,20 @@ from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser,
     PermissionsMixin,
-    UserManager,
-    User
+    UserManager
 )
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import(
+    MinValueValidator
+)
 
 class CustomUserManager(UserManager):
     def _create_user(self, email,password, **extra_fields: Any) -> Any:
         if not email:
             raise ValueError('Логин обязателен')
         email =self.normalize_email(email)
-        user :User= self.model(email=email,**extra_fields)
+        user = self.model(email=email,**extra_fields)
         user.set_password(password)
         user.save(using=self.db)
         return user
@@ -104,6 +106,61 @@ class CurriculumVitae(models.Model):
         UNCOMMERCIAL = 'UNCOMMERCIAL',_('Некоммерческий сектор')
         JURISPRUDENCE = 'JURISPRUDENCE',_('Юриспруденция и право')
         SPORT = 'SPORT',_('Спорт и физическая активность')
+
+    class EmplymentStatus(models.TextChoices):
+        FULL = 'FULL',_('Полная занятость')
+        PART = 'PART',_('Частичная занятость')
+        VOLUNTEERING = 'VOLUNTEERING',_('Волонтерство')
+
+    class YesOrNoChoices(models.TextChoices):
+        NOT_SELECTED = 'NOTSELECTED',_('Не выбрано')
+        YES = 'YES',_('Да')
+        NO = 'NO',_('Нет')
+
+    class ScheduleChoices(models.TextChoices):
+        NOT_SELECTED = 'NOTSELECTED',_('Не выбрано')
+        FULL_DAY = 'FULL_DAY',_('Полный день')
+        FLEX = 'FLEX',_('Гибкий формат')
+        TWOXTWO = '2x2',_('2/2')
+        HALF_TIME = 'HALFTIME',_('Половина ставки')
+        REMOTE = 'REMOTE',_('Удаленная работа')
+        HYBRID = 'HYBRID',_('Гибридный формат')
+
+    class CurrencyChoices(models.TextChoices):
+        NOT_SELECTED = 'NOTSELECTED',_('Не выбрано')
+        KZT = 'KZT',_('Тенге')
+        RUB = 'RUB',_('Рубли')
+        USD = 'USD',_('Доллары')
+        EUR = 'EUR',_('Евро')
+        CAD = 'CAD',_('Канадский доллар')
+        GBP = 'GBP',_('Британский фунт')
+        CNH = 'CNH',_('Китайский юань')
+
+    class CitizenChoises(models.TextChoices):
+        NOT_SELECTED = 'NTS',_('Не выбрано')
+        KAZAKHSTAN = 'KZ',_('Казахстан')
+        RUSSIA = 'RU',_('Российская Федерация')
+        BELARUS = 'BEL',_('Беларусь')
+        UKRAINE = 'UA',_('Украина')
+        UZBEKISTAN = 'UZB',_('Узбекистан')
+        GRUZIA = 'GRX',_('Грузия')
+        CHINA = 'CHN',_('Китай')
+        AZERBAIJAN = 'AZB',_('Азербайджан')
+        ARMENIA = 'ARM',_('Армения')
+        KYRGYZSTAN = 'KRG',_('Кыргызстан')
+        USA = 'USA',_('Соединенные Штаты Америки')
+        CANADA = 'CND',_('Канада')
+        POLAND = 'PL',_('Польша')
+        CHECH_REPUBLIC = 'CZR',_('Чехия')
+        GREECE = 'GRC',_('Греция')
+        GERMANY = 'GRM',_('Германия')
+        ITALY = 'ITL',_('Италия')
+        GREAT_BRITAIN = 'GBT',_('Великобритания')
+        FRANCE = 'FRN',_('Франция')
+        SWEDEN = 'SWD',_('Швеция')
+        SWITZERLAND = 'SWZ',_('Швейцария')
+        NETHERLANDS = 'NTL',_('Нидерланды')
+
     user = models.ForeignKey(
         verbose_name='пользователь',
         to=CustomUser,
@@ -116,17 +173,64 @@ class CurriculumVitae(models.Model):
         null=True,
         blank=True
     )
+    employment_status = models.CharField(
+        verbose_name='занятость',
+        choices=EmplymentStatus.choices,
+        default=EmplymentStatus.FULL
+    )
     category = models.CharField(
         max_length=100,
         choices=Category.choices,
         default=Category.NOT_SELECTED
+    )
+    business_trip_readiness = models.CharField(
+        verbose_name='готовность к командировкам',
+        max_length=11,
+        choices=YesOrNoChoices.choices,
+        default=YesOrNoChoices.NOT_SELECTED
+    )
+    schedule = models.CharField(
+        verbose_name='график работы',
+        choices=ScheduleChoices.choices,
+        default=ScheduleChoices.NOT_SELECTED,
+        max_length=12
+    )
+    desired_salary = models.PositiveIntegerField(
+        verbose_name='желаемая зарплата'
+    )
+    currency = models.CharField(
+        verbose_name='валюта',
+        choices=CurrencyChoices.choices,
+        default=CurrencyChoices.NOT_SELECTED,
+        max_length=12
+    )
+    phone_number = models.CharField(
+        verbose_name='номер телефона',
+        max_length=100
+    )
+    job_email = models.EmailField(
+        verbose_name='почта для связи',
+        unique=True,
+        null=True,
+        blank=True
+    )
+    citizenship = models.CharField(
+        verbose_name='гражданство',
+        choices=CitizenChoises.choices,
+        default=CitizenChoises.NOT_SELECTED,
+        max_length=3
+    )
+    living_place = models.CharField(
+        verbose_name='город проживания',
+        max_length=150
     )
     photo = models.ImageField(
         verbose_name='фото',
         upload_to=f'cv/',
         null=True,
         blank=True
-    )   
+    )
+
     def __str__(self) -> str:
         return f'{self.user} | {self.title}'
     
