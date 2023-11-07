@@ -108,12 +108,13 @@ class CurriculumVitae(models.Model):
         SPORT = 'SPORT',_('Спорт и физическая активность')
 
     class EmplymentStatus(models.TextChoices):
+        NOT_SELECTED = 'NSL',_('Не выбрано')
         FULL = 'FULL',_('Полная занятость')
         PART = 'PART',_('Частичная занятость')
-        VOLUNTEERING = 'VOLUNTEERING',_('Волонтерство')
+        VOLUNTEERING = 'VLNT',_('Волонтерство')
 
     class YesOrNoChoices(models.TextChoices):
-        NOT_SELECTED = 'NOTSELECTED',_('Не выбрано')
+        NOT_SELECTED = 'NSL',_('Не выбрано')
         YES = 'YES',_('Да')
         NO = 'NO',_('Нет')
 
@@ -176,18 +177,20 @@ class CurriculumVitae(models.Model):
     employment_status = models.CharField(
         verbose_name='занятость',
         choices=EmplymentStatus.choices,
-        default=EmplymentStatus.FULL
+        default=EmplymentStatus.FULL,
+        max_length=4
     )
     category = models.CharField(
+        verbose_name='категория',
         max_length=100,
         choices=Category.choices,
-        default=Category.NOT_SELECTED
+        default=Category.NOT_SELECTED,
     )
     business_trip_readiness = models.CharField(
         verbose_name='готовность к командировкам',
-        max_length=11,
         choices=YesOrNoChoices.choices,
-        default=YesOrNoChoices.NOT_SELECTED
+        default=YesOrNoChoices.NOT_SELECTED,
+        max_length=3
     )
     schedule = models.CharField(
         verbose_name='график работы',
@@ -196,7 +199,8 @@ class CurriculumVitae(models.Model):
         max_length=12
     )
     desired_salary = models.PositiveIntegerField(
-        verbose_name='желаемая зарплата'
+        verbose_name='желаемая зарплата',
+        default=100
     )
     currency = models.CharField(
         verbose_name='валюта',
@@ -206,7 +210,8 @@ class CurriculumVitae(models.Model):
     )
     phone_number = models.CharField(
         verbose_name='номер телефона',
-        max_length=100
+        max_length=100,
+        default=None
     )
     job_email = models.EmailField(
         verbose_name='почта для связи',
@@ -222,7 +227,8 @@ class CurriculumVitae(models.Model):
     )
     living_place = models.CharField(
         verbose_name='город проживания',
-        max_length=150
+        max_length=150,
+        default='Караганда'
     )
     photo = models.ImageField(
         verbose_name='фото',
