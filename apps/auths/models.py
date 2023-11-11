@@ -8,10 +8,14 @@ from django.contrib.auth.models import (
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import(
-    MinValueValidator
+    MinValueValidator,
+    MaxValueValidator
 )
+import datetime
+from django.utils import timezone
 
 class CustomUserManager(UserManager):
+    """- Менеджер объектов пользователя"""
     def _create_user(self, email,password, **extra_fields: Any) -> Any:
         if not email:
             raise ValueError('Логин обязателен')
@@ -25,6 +29,7 @@ class CustomUserManager(UserManager):
         extra_fields.setdefault('is_staff',False)
         extra_fields.setdefault('is_superuser',False)
         return self._create_user(email,password,**extra_fields)
+
     
     def create_superuser(self, email, password, **extra_fields: Any) -> Any:
         extra_fields.setdefault('is_staff',True)
@@ -33,6 +38,8 @@ class CustomUserManager(UserManager):
        
 
 class CustomUser(AbstractBaseUser,PermissionsMixin):
+    """- Модель пользователя"""
+
     email = models.EmailField(
         verbose_name='почта',
         unique=True
@@ -53,6 +60,10 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
         verbose_name='дата рождения',
         null=True,
         blank=True
+    )
+    is_company = models.BooleanField(
+        verbose_name='компания',
+        default=False
     )
     is_active = models.BooleanField(
         verbose_name='статус активности',
@@ -76,18 +87,38 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = []
 
+    def __str__(self) -> str:
+        return f'{self.email} |Компания:  {self.is_company}'
+    
+    def get_full_name(self):
+        return f'{self.first_name} {self.last_name}'
+
     class Meta:
         verbose_name = 'пользователь'
         verbose_name_plural = 'пользователи'
         ordering = ('-id',)
 
-    def get_full_name(self):
-        return f'{self.first_name} {self.last_name}'
     
 
-class CurriculumVitae(models.Model):
+class Languages(models.Model):
+    title = models.CharField(
+        verbose_name='язык',
+        max_length=100,
+        unique=True
+    )
 
-    class Category(models.TextChoices):
+    def __str__(self) -> str:
+        return self.title
+    
+    class Meta:
+        verbose_name = 'язык'
+        verbose_name_plural = 'языки'
+        ordering = ('title',)
+
+class CurriculumVitae(models.Model):
+    """- Модель резюме"""
+
+    class CategoryChoices(models.TextChoices):
         NOT_SELECTED = 'NOT_SELECTED',_('Не выбрано')
         IT = 'IT',_('Информаионные технологии')
         HEALTH = 'HEALTH',_('Здравохранение')
@@ -107,7 +138,7 @@ class CurriculumVitae(models.Model):
         JURISPRUDENCE = 'JURISPRUDENCE',_('Юриспруденция и право')
         SPORT = 'SPORT',_('Спорт и физическая активность')
 
-    class EmplymentStatus(models.TextChoices):
+    class EmplymentStatusChoices(models.TextChoices):
         NOT_SELECTED = 'NSL',_('Не выбрано')
         FULL = 'FULL',_('Полная занятость')
         PART = 'PART',_('Частичная занятость')
@@ -137,7 +168,7 @@ class CurriculumVitae(models.Model):
         GBP = 'GBP',_('Британский фунт')
         CNH = 'CNH',_('Китайский юань')
 
-    class CitizenChoises(models.TextChoices):
+    class CitizenChoices(models.TextChoices):
         NOT_SELECTED = 'NTS',_('Не выбрано')
         KAZAKHSTAN = 'KZ',_('Казахстан')
         RUSSIA = 'RU',_('Российская Федерация')
@@ -162,6 +193,32 @@ class CurriculumVitae(models.Model):
         SWITZERLAND = 'SWZ',_('Швейцария')
         NETHERLANDS = 'NTL',_('Нидерланды')
 
+    class EducationChoices(models.TextChoices):
+        MEDIUM= 'MDM',_('Среднее профессиональное образование')
+        HIGH_BACHELOR = 'HBC',_('Высшее (бакалавриат)')
+        HIGH_MAGISTR = 'HMG',_('Высшее (магистратура)')
+        HIGH_PHD = 'HPH',_('Высшее (докторантура)')
+        NONE = 'NON',_('Нет')
+
+    class GenderChoices(models.TextChoices):
+        NOT_SELECTED = 'N',_('Не выбрано')
+        MAN = 'M',_("Мужской")
+        WOMAN = 'W',_('Женский')
+
+
+    class FamilyStatusChoices(models.TextChoices):
+        NOT_SELECTED = 'N',_('Не выбрано')
+        SINGLE = 'S',_('Не в браке')
+        MARRIAGE ='M',_('В браке')
+        MARRIAGE_AND_CHILDREN = 'MH',_('В браке (есть дети)')
+        COUPLE = 'CP',_('В отношениях')
+
+
+    class EducationFormChoices(models.TextChoices):
+        FULL_TIME = 'FT',_('Очная')
+        PART_TIME = 'PT',_('Очно-заочная')
+        DISTANCE_LEARNING = 'DL',_('Заочная')
+
     user = models.ForeignKey(
         verbose_name='пользователь',
         to=CustomUser,
@@ -174,17 +231,23 @@ class CurriculumVitae(models.Model):
         null=True,
         blank=True
     )
+    birth_date = models.DateField(
+        verbose_name='дата рождения',
+        default=timezone.datetime.now(),
+        null=True,
+        blank=True
+    )
     employment_status = models.CharField(
         verbose_name='занятость',
-        choices=EmplymentStatus.choices,
-        default=EmplymentStatus.FULL,
+        choices=EmplymentStatusChoices.choices,
+        default=EmplymentStatusChoices.FULL,
         max_length=4
     )
     category = models.CharField(
         verbose_name='категория',
         max_length=100,
-        choices=Category.choices,
-        default=Category.NOT_SELECTED,
+        choices=CategoryChoices.choices,
+        default=CategoryChoices.NOT_SELECTED,
     )
     business_trip_readiness = models.CharField(
         verbose_name='готовность к командировкам',
@@ -221,8 +284,8 @@ class CurriculumVitae(models.Model):
     )
     citizenship = models.CharField(
         verbose_name='гражданство',
-        choices=CitizenChoises.choices,
-        default=CitizenChoises.NOT_SELECTED,
+        choices=CitizenChoices.choices,
+        default=CitizenChoices.NOT_SELECTED,
         max_length=3
     )
     living_place = models.CharField(
@@ -230,12 +293,83 @@ class CurriculumVitae(models.Model):
         max_length=150,
         default='Караганда'
     )
+    education = models.CharField(
+        verbose_name='образование',
+        max_length=3,
+        choices=EducationChoices.choices,
+        default=EducationChoices.NONE
+    )
+    gender = models.CharField(
+        verbose_name='пол',
+        max_length=1,
+        choices=GenderChoices.choices,
+        default=GenderChoices.NOT_SELECTED
+    )
+    family_status = models.CharField(
+        verbose_name='семейное положение',
+        max_length=2,
+        choices=FamilyStatusChoices.choices,
+        default=FamilyStatusChoices.NOT_SELECTED
+    )
+    university = models.CharField(
+        verbose_name='университет',
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    university_graduate_year = models.PositiveSmallIntegerField(
+        verbose_name='год окончания',
+        validators=[
+            MinValueValidator(1970),
+            MaxValueValidator(2030)
+        ],
+        default=2006
+    )
+    faculty = models.CharField(
+        verbose_name='факультет',
+        max_length=150,
+        null=True,
+        blank=True
+    )
+    speciality = models.CharField(
+        verbose_name='специальность',
+        max_length=150,
+        null=True,
+        blank=True
+    )
+    education_form = models.CharField(
+        verbose_name='форма обучения',
+        max_length=2,
+        choices=EducationFormChoices.choices,
+        default=EducationFormChoices.FULL_TIME
+    )
+
     photo = models.ImageField(
         verbose_name='фото',
         upload_to=f'cv/',
         null=True,
         blank=True
     )
+    coursess = models.TextField(
+        verbose_name='курсы',
+        null=True,
+        blank=True,
+        help_text='Напишите о курсах, которые проходили(необязательно)'
+    )
+
+    languages = models.ManyToManyField(
+        verbose_name='владение языками',
+        to=Languages
+    )
+
+    @property
+    def get_age(self):
+        current_date = timezone.now()
+        birth_year, birth_month, birth_day = self.birth_date.year, self.birth_date.month, self.birth_date.day
+        current_year, current_month, current_day = current_date.year, current_date.month, current_date.day
+        age = current_year - birth_year - ((current_month, current_day) < (birth_month, birth_day))
+        return age
+    
 
     def __str__(self) -> str:
         return f'{self.user} | {self.title}'

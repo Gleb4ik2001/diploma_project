@@ -1,13 +1,14 @@
 from pathlib import Path
 import sys
 import os
+from decouple import config
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(BASE_DIR)
 sys.path.append(os.path.join(BASE_DIR,'apps'))
 
-SECRET_KEY = 'django-insecure-xvo2r!v(i*jdk7x2k4(2azypp=(7#7)vxv-4)ng7%kcnxj@2q7'
+SECRET_KEY = config('SECRET_KET',str)
 
 DEBUG = True
 
