@@ -3,10 +3,14 @@ from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
-from auths.views import RezumeViewSet
+from auths.views import (
+    RezumeViewSet,
+    VacancyViewSet
+)
 
 router = DefaultRouter()
 router.register(r'cv',RezumeViewSet,basename='rezume')
+router.register(r'vacancy',VacancyViewSet,basename='vacancy')
 
 
 urlpatterns = [

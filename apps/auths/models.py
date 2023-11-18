@@ -9,7 +9,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import(
     MinValueValidator,
-    MaxValueValidator
+    MaxValueValidator,
+    FileExtensionValidator
 )
 import datetime
 from django.utils import timezone
@@ -56,6 +57,18 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
         null=True,
         blank=True
     )
+    photo = models.ImageField(
+        verbose_name='фото/логотип',
+        upload_to='logos/',
+        null=True,
+        blank=True,
+        validators=[
+            FileExtensionValidator(
+                ['PNG', 'JPEG', 'GIF', 'RAW', 'TIFF', 'BMP', 'PSD','JPG'],
+                'Формат загруженного файла не поддерживается'
+            )
+        ]
+    )
     birth_date = models.DateField(
         verbose_name='дата рождения',
         null=True,
@@ -100,7 +113,7 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
 
     
 
-class Languages(models.Model):
+class Language(models.Model):
     title = models.CharField(
         verbose_name='язык',
         max_length=100,
@@ -233,9 +246,7 @@ class CurriculumVitae(models.Model):
     )
     birth_date = models.DateField(
         verbose_name='дата рождения',
-        default=timezone.datetime.now(),
-        null=True,
-        blank=True
+        default=timezone.now
     )
     employment_status = models.CharField(
         verbose_name='занятость',
@@ -359,7 +370,7 @@ class CurriculumVitae(models.Model):
 
     languages = models.ManyToManyField(
         verbose_name='владение языками',
-        to=Languages
+        to=Language
     )
 
     @property
@@ -381,4 +392,68 @@ class CurriculumVitae(models.Model):
 
     
 
+class Vacancy(models.Model):
 
+    class WorkExperienceChoices(models.TextChoices):
+        NO_EXPERIENCE = 'NO',_('Без опыта')
+        ONETOTHREE = '1-3',_('1-3 года')
+        THREETOFIVE = '3-5',_('3-5 лет')
+        FIVEANDMORE = '5-M',_('5 лет и больше')
+
+    company = models.ForeignKey(
+        verbose_name='компания',
+        to=CustomUser,
+        related_name='vacancy',
+        on_delete=models.PROTECT
+    )
+    title = models.CharField(
+        verbose_name='название вакансии',
+        max_length=150
+    )
+    category = models.CharField(
+        verbose_name='категория',
+        choices=CurriculumVitae.CategoryChoices.choices,
+        default=CurriculumVitae.CategoryChoices.NOT_SELECTED,
+        max_length=100
+    )
+    publish_date = models.DateTimeField(
+        verbose_name='дата публикации',
+        auto_created=True,
+        default=datetime.datetime.now()
+    )
+    about_company = models.TextField(
+        verbose_name='о компании',
+        help_text='расскажите о вашей компании'
+    )
+    responsibilities = models.TextField(
+        verbose_name='обязанности кандидата',
+        help_text='расскажите об обязанностях кандидата'
+    )
+    specialization = models.TextField(
+        verbose_name='специализация компании',
+        help_text='расскажите о вашей специализации'
+    )
+    requirements = models.TextField(
+        verbose_name='требования к кандидату',
+        help_text='расскажите о требованиях к кандидату'
+    )
+    schedule = models.CharField(
+        verbose_name='график работы',
+        max_length=15,
+        choices=CurriculumVitae.ScheduleChoices.choices,
+        default=CurriculumVitae.ScheduleChoices.NOT_SELECTED
+    )
+    work_experience = models.CharField(
+        verbose_name='опыт работы',
+        max_length=5,
+        choices=WorkExperienceChoices.choices,
+        default=WorkExperienceChoices.ONETOTHREE
+    )
+
+    def __str__(self) -> str:
+        return f'{self.company} | {self.title}'
+    
+    class Meta:
+        verbose_name = 'вакансия'
+        verbose_name_plural = 'вакансии'
+        ordering = ('-id',)

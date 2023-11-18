@@ -2,8 +2,14 @@ from django.shortcuts import render
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework.request import Request
-from .models import CurriculumVitae
-from .serializers import CurriculumVitaeSerializer
+from .models import (
+    CurriculumVitae,
+    Vacancy
+)
+from .serializers import (
+    CurriculumVitaeSerializer,
+    VacancySerializer
+)
 from rest_framework.status import(
     HTTP_404_NOT_FOUND,
     HTTP_200_OK
@@ -42,3 +48,11 @@ class RezumeViewSet(ViewSet):
         )
 
     
+class VacancyViewSet(ViewSet):
+    queryset = Vacancy.objects.all()
+
+    def list(self,request:Request,*args,**kwargs):
+        serializer = VacancySerializer(instance=self.queryset,many=True)
+        return Response(
+            data=serializer.data
+        )
