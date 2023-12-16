@@ -1,13 +1,11 @@
 from django.contrib import admin
 from .models import (
     CustomUser,
-    CurriculumVitae,
-    Language,
-    Vacancy
+    JobSeeker,
+    Company,
 )
 
 
 admin.site.register(CustomUser)
-admin.site.register(CurriculumVitae)
-admin.site.register(Language)
-admin.site.register(Vacancy)
+admin.site.register(JobSeeker)
+admin.site.register(Company)
