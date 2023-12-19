@@ -21,7 +21,6 @@ from datetime import(
     timedelta
 )
 from django.utils import timezone
-import jwt
 from django.core import signing
 
 class CustomUserManager(BaseUserManager):
@@ -42,22 +41,39 @@ class CustomUserManager(BaseUserManager):
     
     def get_queryset(self, *args, **kwargs) -> QuerySet:
         result = super().get_queryset(*args, **kwargs)
-        return result.filter(role__in=[CustomUser.Role.JOBSEEKER, CustomUser.Role.COMPANY])
+        return result.all()
        
 
 class CustomUser(AbstractBaseUser,PermissionsMixin):
     """Модель пользователя"""
 
-    class Role(models.TextChoices):
-        JOBSEEKER = 'JOBSEEKER',_('Jobseeker')
-        COMPANY = 'COMPANY',_('Company')
-
-
-    base_role = Role.JOBSEEKER
     email = models.EmailField(
         verbose_name='почта',
         unique=True,
         validators=[EmailValidator("Введите корректный адрес электронной почты.")]
+    )
+    first_name = models.CharField(
+        verbose_name='имя',
+        max_length=100,
+        null=True,
+        blank=True
+    )
+    last_name = models.CharField(
+        verbose_name='фамилия',
+        max_length=150,
+        null=True,
+        blank=True
+    )
+    company_name = models.CharField(
+        verbose_name='название компании',
+        max_length=100,
+        null=True,
+        blank=True
+    )
+    birth_date = models.DateField(
+        verbose_name='дата рождения',
+        null=True,
+        blank=True
     )
     photo = models.ImageField(
         verbose_name='фото/логотип',
@@ -71,10 +87,9 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
             )
         ]
     )
-    role = models.CharField(
-        verbose_name = 'роль',
-        max_length = 30,
-        choices = Role.choices
+    is_company = models.BooleanField(
+        verbose_name = 'компания',
+        default=False
     )
     is_active = models.BooleanField(
         verbose_name='статус активности',
@@ -99,8 +114,6 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     REQUIRED_FIELDS = []
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            self.role = self.base_role
         return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
@@ -109,27 +122,6 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     def get_full_name(self):
         return f'{self.first_name} {self.last_name}'
     
-    
-    @property
-    def token(self):
-        """
-        Позволяет получить токен пользователя путем вызова user.token, вместо
-        user._generate_jwt_token()
-        """
-        return self._generate_jwt_token()
-    
-    def _generate_jwt_token(self):
-        """
-        Генерирует веб-токен JSON, в котором хранится идентификатор этого
-        пользователя, срок действия токена составляет 1 день от создания
-        """
-        dt = datetime.now() + timedelta(days=1)
-        token_data = {
-        'id': self.pk,
-        'exp': int(dt.strftime("%S"))
-        }
-        token = signing.dumps(token_data, key=settings.SECRET_KEY)
-        return token
     
     class Meta:
         verbose_name = 'пользователь'
@@ -140,62 +132,29 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
 class JobSeekerManager(BaseUserManager):
     def get_queryset(self, *args, **kwargs) -> QuerySet:
         result = super().get_queryset(*args, **kwargs)
-        return result.filter(role=CustomUser.Role.JOBSEEKER)
-
-
-class JobSeeker(CustomUser):
-    """
-    Модель для соискателя работы
-    """
-    base_role = CustomUser.Role.JOBSEEKER
-    first_name = models.CharField(
-        verbose_name='имя',
-        max_length=100,
-        null=True,
-        blank=True
-    )
-    last_name = models.CharField(
-        verbose_name='фамилия',
-        max_length=150,
-        null=True,
-        blank=True
-    )
-    birth_date = models.DateField(
-        verbose_name='дата рождения',
-        null=True,
-        blank=True
-    )
-
-    jobseekers = JobSeekerManager()
-    def welcome(self):
-        return "hello seeker"
+        return result.filter(is_company= False)
     
+class JobSeeker(CustomUser):
+    jobseekers = JobSeekerManager()
+
     class Meta:
+        proxy =True
         verbose_name = 'соискатель'
         verbose_name_plural = 'соискатели'
         ordering = ('-id',)
 
 
+
 class CompanyManager(BaseUserManager):
     def get_queryset(self,*args,**kwargs) -> QuerySet:
         result = super().get_queryset(*args,**kwargs)
-        return result.filter(role =CustomUser.Role.COMPANY)
+        return result.filter(is_company = True)
 
 class Company(CustomUser):
-    """
-    Модель для компании
-    """
-    base_role = CustomUser.Role.COMPANY
-    company_name = models.CharField(
-        verbose_name='название компании',
-        max_length=100,
-        null=True,
-        blank=True
-    )
+
     companys = CompanyManager()
-    def welcome(self):
-        return "hello company"
     class Meta:
+        proxy =True
         verbose_name = 'компания'
         verbose_name_plural = 'компания'
         ordering = ('-id',)

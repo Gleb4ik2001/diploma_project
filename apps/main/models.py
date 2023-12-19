@@ -2,8 +2,8 @@ from datetime import datetime, timezone
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from auths.models import (
-    JobSeeker,
-    Company
+    Company,
+    CustomUser
 )
 from django.core.validators import(
     MinValueValidator,
@@ -135,7 +135,7 @@ class CurriculumVitae(models.Model):
 
     user = models.ForeignKey(
         verbose_name='пользователь',
-        to=JobSeeker,
+        to=CustomUser,
         on_delete=models.PROTECT,
         related_name='cv',
     )
@@ -190,7 +190,6 @@ class CurriculumVitae(models.Model):
     )
     job_email = models.EmailField(
         verbose_name='почта для связи',
-        unique=True,
         null=True,
         blank=True
     )
@@ -301,9 +300,13 @@ class Vacancy(models.Model):
         THREETOFIVE = '3-5',_('3-5 лет')
         FIVEANDMORE = '5-M',_('5 лет и больше')
 
+    class SeleryTypeChoises(models.TextChoices):
+        NETTO  = 'NETTO',_('Нетто')
+        BRUTTO = 'BRUTTO',_('Брутто')
+
     company = models.ForeignKey(
         verbose_name='компания',
-        to=Company,
+        to=CustomUser,
         related_name='vacancy',
         on_delete=models.PROTECT
     )
@@ -316,6 +319,26 @@ class Vacancy(models.Model):
         choices=CurriculumVitae.CategoryChoices.choices,
         default=CurriculumVitae.CategoryChoices.NOT_SELECTED,
         max_length=100
+    )
+    selery_lower_limit = models.PositiveIntegerField(
+        verbose_name = 'зарплата от',
+        null= True,
+        blank = True,
+        help_text='введите нижний предел зарплаты'
+    )
+    selery_upper_limit = models.PositiveIntegerField(
+        verbose_name = 'зарплата до',
+        null = True,
+        blank = True,
+        help_text='введите верхний предел зарплаты'
+    )
+    selery_type = models.CharField(
+        verbose_name = 'тип зарплаты',
+        max_length= 15,
+        choices = SeleryTypeChoises.choices,
+        null = True,
+        blank = True,
+        help_text='выберите тип выплачиваемой зарплаты'
     )
     publish_date = models.DateTimeField(
         verbose_name='дата публикации',
@@ -358,3 +381,5 @@ class Vacancy(models.Model):
         verbose_name = 'вакансия'
         verbose_name_plural = 'вакансии'
         ordering = ('-id',)
+
+
