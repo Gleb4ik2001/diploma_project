@@ -33,6 +33,24 @@ class CustomUserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
+    
+    def create_jobseeker(self,email,password = None,**extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email,is_company=False,**extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
+    
+    def create_company(self,email,password = None,**extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email,is_company=True,**extra_fields)
+        user.set_password(password)
+        user.save()
+        return user
 
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)

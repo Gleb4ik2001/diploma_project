@@ -29,7 +29,8 @@ DJANGO_APPS = [
 
 PROJECT_APPS = [
     'auths.apps.AuthsConfig',
-    'main.apps.MainConfig'
+    'main.apps.MainConfig',
+    'frontend.apps.FrontendConfig'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + PROJECT_APPS
@@ -97,11 +98,11 @@ REST_FRAMEWORK = {
     ],
 }
 
-CORS_ALLOW_ALL_ORIGINS = False
 
-CORS_ALLOWED_ORIGINS = (
-    'http://127.0.0.1',
-)
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:8000',
+    # Добавьте другие разрешенные домены по мере необходимости
+]
 LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'Asia/Almaty'

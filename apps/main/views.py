@@ -32,7 +32,7 @@ class CurriculumVitaeViewSet(viewsets.ModelViewSet):
             return [permissions.AllowAny()]
         elif self.action in ['retrieve','update','partial_update','destroy','create']:
             return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]  # Разрешение по умолчанию
+        return [permissions.AllowAny()]  
         
 
     def list(self, request, *args, **kwargs):
@@ -41,7 +41,6 @@ class CurriculumVitaeViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request,pk=None, *args, **kwargs):
-        # Метод для получения одного резюме по его идентификатору
         try:
             cv = self.queryset.get(id=pk)
         except CurriculumVitae.DoesNotExist:
@@ -56,10 +55,9 @@ class CurriculumVitaeViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        # Метод для создания нового резюме
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=request.user)  # Присваиваем текущего пользователя
+        serializer.save(user=request.user) 
         return Response(serializer.data, status=201)
 
     def update(self, request,pk=None, *args, **kwargs):

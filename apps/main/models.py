@@ -2,8 +2,9 @@ from datetime import datetime, timezone
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from auths.models import (
+    CustomUser,
     Company,
-    CustomUser
+    JobSeeker
 )
 from django.core.validators import(
     MinValueValidator,
@@ -332,6 +333,13 @@ class Vacancy(models.Model):
         blank = True,
         help_text='введите верхний предел зарплаты'
     )
+    selery_currency= models.CharField(
+        verbose_name = 'валюта',
+        max_length = 15,
+        choices = CurriculumVitae.CurrencyChoices.choices,
+        null = True,
+        blank= True
+    )
     selery_type = models.CharField(
         verbose_name = 'тип зарплаты',
         max_length= 15,
@@ -383,3 +391,36 @@ class Vacancy(models.Model):
         ordering = ('-id',)
 
 
+class VacancyResponses(models.Model):
+
+    user = models.ForeignKey(
+        verbose_name = 'пользователь',
+        to= CustomUser,
+        on_delete = models.CASCADE,
+        related_name = 'vacancy_responses'
+    )
+    vacancy = models.ForeignKey(
+        verbose_name = 'вакансия',
+        to= Vacancy,
+        on_delete = models.CASCADE,
+        related_name = 'responses'
+    )
+    cv = models.ForeignKey(
+        verbose_name = 'резюме',
+        to = CurriculumVitae,
+        on_delete = models.CASCADE,
+        related_name = 'responses'
+    )
+    datetime_response = models.DateTimeField(
+        verbose_name = 'дата и время отклика',
+        auto_now_add = True,
+        null = True,
+        blank = True
+    )
+
+    def __str__(self) -> str:
+        return f'{self.user} откликнулся на вакансию: {self.vacancy} | Дата: {self.datetime_response}'
+    class Meta:
+        verbose_name = 'отклик на вакансию'
+        verbose_name_plural = 'отклики на вакансию'
+        ordering = ('-id',)

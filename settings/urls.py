@@ -8,7 +8,8 @@ from rest_framework.routers import DefaultRouter
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/',include('auths.urls'),name='auths'),
-    path('api/v1/',include('main.urls'),name='main_urls')
+    path('api/v1/',include('main.urls'),name='main_urls'),
+    path('',include('frontend.urls'),name='frontend')
 ]
 
 urlpatterns += [
