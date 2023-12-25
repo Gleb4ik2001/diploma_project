@@ -17,7 +17,7 @@
 
         <div class="card">
             <div class="card-body">
-                <h2 class="card-title">Регистрация для соискателя работы</h2>
+                <h2 class="card-title">Регистрация для компании</h2>
     
                 <form id="registrationForm">
                     {% csrf_token %}
@@ -30,35 +30,28 @@
                         <input type="password" class="form-control" id="registrationPassword" required>
                     </div>
                     <div class="form-group">
-                        <label>Имя:</label>
-                        <input type="text" class="form-control" id="registrationFirstName" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Фамилия:</label>
-                        <input type="text" class="form-control" id="registrationLastName" required>
+                        <label>Название компании:</label>
+                        <input type="text" class="form-control" id="registrationCompanyName" required>
                     </div>
                     <input type="hidden" id="redirectUrl" value="http://localhost:8000/login/">
-                    <input type="hidden" id="redirectCompanyregistrateUrl" value="http://localhost:8000/company_registrate/">
-                    <button type="button" class="btn btn-primary" onclick="registerUser()">Зарегистрироватсья как соискатель</button>
+                    <button type="button" class="btn btn-primary" onclick="registerCompany()">Зарегистрироватсья как соискатель</button>
                 </form>
-                <button type="button" class="btn btn-dark mt-2" onclick="redirectToCompanyRegistrate()">Регистрация для компании</button>
             </div>
         </div>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
-    function registerUser() {
+    function registerCompany() {
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
         const registrationData = {
             email: document.getElementById('registrationEmail').value,
             password: document.getElementById('registrationPassword').value,
-            first_name: document.getElementById('registrationFirstName').value,
-            last_name: document.getElementById('registrationLastName').value
+            company_name: document.getElementById('registrationCompanyName').value
         };
 
-        fetch('http://localhost:8000/auth/api/jobseeker_register/', {
+        fetch('http://localhost:8000/auth/api/company_register/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -69,20 +62,13 @@
         .then(response => response.json())
         .then(data => {
             console.log('Success:', data);
-            alert('User registered successfully');
-            // Получаем URL перенаправления
             const redirectUrl = document.getElementById('redirectUrl').value;
-            // Перенаправляем пользователя на страницу входа
             window.location.href = redirectUrl;
         })
         .catch((error) => {
             console.error('Error:', error);
-            alert('Failed to register user');
+            alert('Ошибка, проверьте введенные данные и попробуйте еще раз');
         });
-    }
-    function redirectToCompanyRegistrate(){
-        const redirectCompanyRegistrateUrl = document.getElementById('redirectCompanyregistrateUrl').value;
-        window.location.href = redirectCompanyRegistrateUrl;
     }
 
 </script>

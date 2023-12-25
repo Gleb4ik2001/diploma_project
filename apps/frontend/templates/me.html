@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Мой профиль</title>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand text-danger" href="http://localhost:8000/main-page/">HitHader</a>
+    </nav>
+    <div class="container mt-5">
+        <h2>Мой профиль</h2>
+        <div id="user-info">
+            <!-- User information will be displayed here dynamically -->
+        </div>
+        <hr>
+        <h4>Обновить информацию</h4>
+        <form id="updateProfileForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="updateFirstName">Имя:</label>
+                <input type="text" class="form-control" id="updateFirstName" required>
+            </div>
+            <div class="form-group">
+                <label for="updateLastName">Фамилия:</label>
+                <input type="text" class="form-control" id="updateLastName" required>
+            </div>
+            <div class="form-group">
+                <label for="updateBirthDate">Дата рождения:</label>
+                <input type="text" class="form-control" id="updateBirthDate" placeholder="ГГГГ-ММ-ДД" required>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="updateProfile()">Обновить</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+       document.addEventListener('DOMContentLoaded', function () {
+            // Fetch user data when the page loads
+            fetchUserData();
+        });
+
+        function fetchUserData() {
+            fetch('http://localhost:8000/auth/api/me/')
+                .then(response => response.json())
+                .then(data => {
+                    // Display user information
+                    const userInfoDiv = document.getElementById('user-info');
+                    userInfoDiv.innerHTML = `
+                        <p><strong>Email:</strong> ${data.email}</p>
+                        <p><strong>Имя:</strong> ${data.first_name}</p>
+                        <p><strong>Фамилия:</strong> ${data.last_name}</p>
+                        <p><strong>Дата рождения:</strong> ${data.birth_date}</p>
+                    `;
+
+                    // Display user photo if available
+                    if (data.photo) {
+                        const photoElement = document.createElement('img');
+                        photoElement.src = data.photo;
+                        photoElement.alt = 'User Photo';
+                        userInfoDiv.appendChild(photoElement);
+                    }
+                    
+                    // Set input fields for updating user profile
+                    document.getElementById('updateFirstName').value = data.first_name;
+                    document.getElementById('updateLastName').value = data.last_name;
+                    document.getElementById('updateBirthDate').value = data.birth_date;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function updateProfile() {
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            const updateData = {
+                first_name: document.getElementById('updateFirstName').value,
+                last_name: document.getElementById('updateLastName').value,
+                birth_date: document.getElementById('updateBirthDate').value,
+            };
+
+            fetch('http://localhost:8000/auth/api/me/update/', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify(updateData),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // If the update is successful, fetch and display updated user data
+                    fetchUserData();
+                    alert('Profile updated successfully');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to update profile');
+                });
+        }
+    </script>
+</body>
+
+</html>

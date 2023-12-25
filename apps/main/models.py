@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import Any
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from auths.models import (
@@ -30,28 +31,26 @@ class Language(models.Model):
         verbose_name_plural = 'языки'
         ordering = ('title',)
 
+
+class CategoryChoices(models.Model):
+        title = models.CharField(
+            verbose_name ='категория',
+            max_length=100,
+            unique = True
+        )
+        def __str__(self) -> Any:
+            return self.title
+        
+        class Meta:
+            verbose_name= 'категория'
+            verbose_name_plural = 'категории'
+            ordering = ('-id',)
+
+
 class CurriculumVitae(models.Model):
     """- Модель резюме"""
 
-    class CategoryChoices(models.TextChoices):
-        NOT_SELECTED = 'NOT_SELECTED',_('Не выбрано')
-        IT = 'IT',_('Информаионные технологии')
-        HEALTH = 'HEALTH',_('Здравохранение')
-        EDUCATION = 'EDUCATION',_('Образование')
-        MANUFACTURING = 'MANUFACTURING',_('Производство и инженерия')
-        FINANCES = 'FINANCES',_('Финансы')
-        MARKETING = 'MARKETING',_('Маркетинг и реклама')
-        HOTEL = 'HOTEL',_('Гостиничный бизнес')
-        RESTAURANT = 'RESTAURANT',_('Ресторанный бизнес')
-        SALES = 'SALES',_('Продажи')
-        ART = 'ART',_('Искусство')
-        FUN = 'FUN',_('Развлечения')
-        TRANSPORT = 'TRANSPORT',_('Транспорт и логистика')
-        BUILDING = 'BUILDING',_('Строительство и архитектура')
-        AGRICULTURE = 'AGRICULTURE',_('Сельское хозяйство и сельскохозяйственные науки')
-        UNCOMMERCIAL = 'UNCOMMERCIAL',_('Некоммерческий сектор')
-        JURISPRUDENCE = 'JURISPRUDENCE',_('Юриспруденция и право')
-        SPORT = 'SPORT',_('Спорт и физическая активность')
+    
 
     class EmplymentStatusChoices(models.TextChoices):
         NOT_SELECTED = 'NSL',_('Не выбрано')
@@ -156,11 +155,12 @@ class CurriculumVitae(models.Model):
         default=EmplymentStatusChoices.FULL,
         max_length=4
     )
-    category = models.CharField(
+    category = models.ForeignKey(
         verbose_name='категория',
-        max_length=100,
-        choices=CategoryChoices.choices,
-        default=CategoryChoices.NOT_SELECTED,
+        to = CategoryChoices,
+        on_delete = models.CASCADE,
+        null = True,
+        blank =True
     )
     business_trip_readiness = models.CharField(
         verbose_name='готовность к командировкам',
@@ -315,11 +315,12 @@ class Vacancy(models.Model):
         verbose_name='название вакансии',
         max_length=150
     )
-    category = models.CharField(
+    category = models.ForeignKey(
         verbose_name='категория',
-        choices=CurriculumVitae.CategoryChoices.choices,
-        default=CurriculumVitae.CategoryChoices.NOT_SELECTED,
-        max_length=100
+        to = CategoryChoices,
+        on_delete = models.CASCADE,
+        null = True,
+        blank =True
     )
     selery_lower_limit = models.PositiveIntegerField(
         verbose_name = 'зарплата от',

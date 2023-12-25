@@ -2,7 +2,8 @@ from rest_framework.serializers import ModelSerializer
 from .models import (
     CurriculumVitae,
     Language,
-    Vacancy
+    Vacancy,
+    CategoryChoices
 )
 from auths.models import CustomUser, JobSeeker
 from rest_framework import serializers
@@ -25,4 +26,9 @@ class VacancySerializer(serializers.ModelSerializer):
 class LanguageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Language
+        fields = '__all__'
+    
+class CategoryChoicesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CategoryChoices
         fields = '__all__'

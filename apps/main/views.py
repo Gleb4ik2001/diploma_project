@@ -3,13 +3,16 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
+from rest_framework.generics import ListAPIView
 from .models import (
     CurriculumVitae,
-    Vacancy
+    Vacancy,
+    CategoryChoices
 )
 from .serializers import (
     CurriculumVitaeSerializer,
     VacancySerializer,
+    CategoryChoicesSerializer
 )
 from rest_framework.status import(
     HTTP_404_NOT_FOUND,
@@ -154,3 +157,18 @@ class VacancyViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         instance.delete()
         return Response(status=204)
+    
+class CategoryApi(viewsets.ViewSet):
+    queryset = CategoryChoices.objects.all()
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (CustomUserAuthentication,)
+
+
+    def list(self, request: Request,*args,**kwargs) -> Response:
+        serializer = CategoryChoicesSerializer(instance=self.queryset, many=True)
+        return Response(serializer.data)
+    
+    def retrieve(self,pk:int, request: Request,) -> Response:
+        category = self.queryset.get(id=pk)
+        serializer = CategoryChoicesSerializer(instance=category,)
+        return Response(serializer.data)

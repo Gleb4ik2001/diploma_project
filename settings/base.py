@@ -93,10 +93,13 @@ REST_FRAMEWORK = {
     # 'DEFAULT_PERMISSION_CLASSES': [
     #     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     # ],
-    # 'DEFAULT_AUTHENTICATION_CLASSES': [
-    #     'rest_framework.authentication.BasicAuthentication'
-    # ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'auths.authentication.CustomUserAuthentication'
+    ],
 }
+# AUTHENTICATION_CLASSES = [
+#     'auths.authentication.CustomUserAuthentication', 
+# ]
 
 
 CORS_ALLOWED_ORIGINS = [
