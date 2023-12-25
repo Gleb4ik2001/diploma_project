@@ -54,3 +54,14 @@ class LoginView(View):
                 'form':form
             }
         )
+
+class JobSeekerMainView(View):
+    template_name = 'jobseeker_main.html'
+
+    def get(self,request:HttpRequest)->HttpRequest:
+        user = request.user
+        return render(
+            request=request,
+            template_name=self.template_name,
+            context={"user":user}
+        )
