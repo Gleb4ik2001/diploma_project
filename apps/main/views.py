@@ -21,19 +21,13 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from rest_framework import permissions
+from auths.authentication import CustomUserAuthentication
 
 class CurriculumVitaeViewSet(viewsets.ModelViewSet):
     queryset = CurriculumVitae.objects.all()
     serializer_class = CurriculumVitaeSerializer
-
-
-    def get_permissions(self):
-        if self.action == 'list':
-            return [permissions.AllowAny()]
-        elif self.action in ['retrieve','update','partial_update','destroy','create']:
-            return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]  
-        
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (CustomUserAuthentication,)
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()

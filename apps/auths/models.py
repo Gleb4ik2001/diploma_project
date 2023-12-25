@@ -5,7 +5,8 @@ from django.contrib.auth.models import (
     AbstractBaseUser,
     PermissionsMixin,
     UserManager,
-    BaseUserManager
+    BaseUserManager,
+    AbstractUser
 )
 from django.db.models.query import QuerySet
 from django.utils import timezone
@@ -22,9 +23,11 @@ from datetime import(
 )
 from django.utils import timezone
 from django.core import signing
+from django.contrib.auth.hashers import make_password
 
 class CustomUserManager(BaseUserManager):
-    """- Менеджер объектов пользователя"""
+    """Менеджер объектов пользователя"""
+
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('The Email field must be set')
@@ -33,36 +36,39 @@ class CustomUserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
-    
-    def create_jobseeker(self,email,password = None,**extra_fields):
+
+    def create_jobseeker(self, email,first_name ,last_name,  password=None,**extra_fields):
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email,is_company=False,**extra_fields)
+        user = self.model(email=email,first_name=first_name,last_name=last_name, is_company=False, **extra_fields)
         user.set_password(password)
+        user.is_active = True
+        user.is_staff = True
         user.save()
         return user
-    
-    def create_company(self,email,password = None,**extra_fields):
+
+    def create_company(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email,is_company=True,**extra_fields)
+        user = self.model(email=email, is_company=True, **extra_fields)
         user.set_password(password)
+        user.is_active = True
+        user.is_staff = True
         user.save()
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
-    
-    def get_queryset(self, *args, **kwargs) -> QuerySet:
+
+    def get_queryset(self, *args, **kwargs):
         result = super().get_queryset(*args, **kwargs)
         return result.all()
-       
 
-class CustomUser(AbstractBaseUser,PermissionsMixin):
+
+class CustomUser(AbstractUser,PermissionsMixin):
     """Модель пользователя"""
 
     email = models.EmailField(
@@ -70,6 +76,7 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
         unique=True,
         validators=[EmailValidator("Введите корректный адрес электронной почты.")]
     )
+    username = None
     first_name = models.CharField(
         verbose_name='имя',
         max_length=100,
@@ -119,20 +126,17 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     )
     is_staff = models.BooleanField(
         verbose_name='статус работника',
-        default=False
+        default=True
     )
     datetime_joined = models.DateTimeField(
         verbose_name='дата регистрации',
-        default=timezone.now
+        auto_now_add = True
     )
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = []
-
-    def save(self, *args, **kwargs):
-        return super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.email

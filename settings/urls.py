@@ -8,13 +8,10 @@ from rest_framework.routers import DefaultRouter
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/',include('auths.urls'),name='auths'),
-    path('api/v1/',include('main.urls'),name='main_urls'),
+    path('main/api/',include('main.urls'),name='main_urls'),
     path('',include('frontend.urls'),name='frontend')
 ]
 
-urlpatterns += [
-    path('api-auth/', include('rest_framework.urls')),
-]
 
 if settings.DEBUG:
     urlpatterns += static(

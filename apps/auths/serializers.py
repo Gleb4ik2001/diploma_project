@@ -1,7 +1,15 @@
 from rest_framework import serializers
 from .models import CustomUser
+from . import services
 
-class JobSeekerRegistrationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomUser
-        fields = ('email','password','first_name','last_name')
+class RegistrateUserSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only = True)
+    email = serializers.CharField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    password = serializers.CharField(write_only = True)
+
+
+    def create(self, validated_data):
+        user = CustomUser.objects.create_jobseeker(**validated_data)
+        return user
