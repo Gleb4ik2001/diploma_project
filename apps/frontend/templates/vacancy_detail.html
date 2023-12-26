@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ vacancy.title }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand text-danger" href="http://localhost:8000/main-page/">HitHader</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'cv_view' %}">Мои резюме</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Отклики</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Избранное</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-success font-weight-bold" href="#" id="navbarDropdown"
+                        role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ user.email }}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#" id="myProfileLink">Мой профиль</a>
+                        <a id="logoutLink" class="dropdown-item" href="#">Выйти</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h1>{{ vacancy.title }}</h1>
+
+        <dl class="row">
+            {% if vacancy.company.company_name %}
+                <dt class="col-sm-3">Компания:</dt>
+                <dd class="col-sm-9">{{ vacancy.company.company_name }}</dd>
+            {% endif %}
+
+            {% if vacancy.category %}
+                <dt class="col-sm-3">Категория:</dt>
+                <dd class="col-sm-9">{{ vacancy.category }}</dd>
+            {% endif %}
+
+            {% if vacancy.selery_lower_limit %}
+                <dt class="col-sm-3">Зарплата от:</dt>
+                <dd class="col-sm-9">{{ vacancy.selery_lower_limit }}</dd>
+            {% endif %}
+
+            {% if vacancy.selery_upper_limit %}
+                <dt class="col-sm-3">Зарплата до:</dt>
+                <dd class="col-sm-9">{{ vacancy.selery_upper_limit }}</dd>
+            {% endif %}
+
+            {% if vacancy.selery_currency %}
+                <dt class="col-sm-3">Валюта:</dt>
+                <dd class="col-sm-9">{{ vacancy.selery_currency }}</dd>
+            {% endif %}
+
+            {% if vacancy.selery_type %}
+                <dt class="col-sm-3">Тип зарплаты:</dt>
+                <dd class="col-sm-9">{{ vacancy.selery_type }}</dd>
+            {% endif %}
+
+            {% if vacancy.about_company %}
+                <dt class="col-sm-3">О компании:</dt>
+                <dd class="col-sm-9">{{ vacancy.about_company }}</dd>
+            {% endif %}
+            {% if vacancy.publish_date %}
+                <dt class="col-sm-3">Дата публикации:</dt>
+                <dd class="col-sm-9">{{ vacancy.publish_date }}</dd>
+            {% endif %}
+            {% if vacancy.responsibilities %}
+                <dt class="col-sm-3">Обязанности кандидата:</dt>
+                <dd class="col-sm-9">{{ vacancy.responsibilities }}</dd>
+            {% endif %}
+            {% if vacancy.specialization %}
+                <dt class="col-sm-3">Специализация компании:</dt>
+                <dd class="col-sm-9">{{ vacancy.specialization }}</dd>
+            {% endif %}
+            {% if vacancy.requirements %}
+                <dt class="col-sm-3">Требования к кандидату:</dt>
+                <dd class="col-sm-9">{{ vacancy.requirements }}</dd>
+            {% endif %}
+            {% if vacancy.schedule %}
+                <dt class="col-sm-3">График работы:</dt>
+                <dd class="col-sm-9">{{ vacancy.schedule }}</dd>
+            {% endif %}
+            {% if vacancy.work_experience %}
+                <dt class="col-sm-3">Опыт работы:</dt>
+                <dd class="col-sm-9">{{ vacancy.work_experience }}</dd>
+            {% endif %}
+
+            <!-- Добавьте аналогичные блоки для других полей -->
+
+        </dl>
+
+        <a href="{% url 'vacancy_detail_view' pk=vacancy.pk %}" class="btn btn-primary">Откликнуться</a>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

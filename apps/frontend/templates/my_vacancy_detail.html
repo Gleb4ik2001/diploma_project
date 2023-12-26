@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ vacancy.title }}</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand text-danger" href="http://localhost:8000/main-page/">HitHader</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'my_vacancys' %}">Опубликованные вакансии</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Поиск по резюме</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-success font-weight-bold" href="#" id="navbarDropdown"
+                        role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ user.email }}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#">Мой профиль</a>
+                        <a id="logoutLink" class="dropdown-item" href="#">Выйти</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h1 class="mb-4">{{ vacancy.title }}</h1>
+        <div class="mb-2">
+            <strong>Компания:</strong> {{ vacancy.company }}
+        </div>
+        <div class="mb-2">
+            <strong>Категория:</strong> {{ vacancy.category }}
+        </div>
+        <div class="mb-2">
+            <strong>Зарплата от:</strong> {{ vacancy.selery_lower_limit }} {{ vacancy.selery_currency }}
+        </div>
+        <div class="mb-2">
+            <strong>Зарплата до:</strong> {{ vacancy.selery_upper_limit }} {{ vacancy.selery_currency }}
+        </div>
+        <div class="mb-2">
+            <strong>Тип зарплаты:</strong> {{ vacancy.selery_type }}
+        </div>
+        <div class="mb-2">
+            <strong>Дата публикации:</strong> {{ vacancy.publish_date }}
+        </div>
+        <div class="mb-2">
+            <strong>О компании:</strong> {{ vacancy.about_company }}
+        </div>
+        <div class="mb-2">
+            <strong>Обязанности кандидата:</strong> {{ vacancy.responsibilities }}
+        </div>
+        <div class="mb-2">
+            <strong>Специализация компании:</strong> {{ vacancy.specialization }}
+        </div>
+        <div class="mb-2">
+            <strong>Требования к кандидату:</strong> {{ vacancy.requirements }}
+        </div>
+        <div class="mb-2">
+            <strong>График работы:</strong> {{ vacancy.schedule }}
+        </div>
+        <div class="mb-2">
+            <strong>Опыт работы:</strong> {{ vacancy.work_experience }}
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

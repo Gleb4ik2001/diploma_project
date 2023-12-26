@@ -13,6 +13,8 @@ from django.core.validators import(
     FileExtensionValidator,
     EmailValidator
 )
+from autoslug import AutoSlugField
+from django.urls import reverse
 
 
 
@@ -22,9 +24,17 @@ class Language(models.Model):
         max_length=100,
         unique=True
     )
-
+    slug = AutoSlugField(
+        populate_from='title',
+        unique=True,
+        editable=True,
+        verbose_name='Slug'
+    )
     def __str__(self) -> str:
         return self.title
+    
+    def get_absolute_url(self):
+        return reverse('language_detail', kwargs={'slug': self.slug})
     
     class Meta:
         verbose_name = 'язык'
@@ -38,8 +48,17 @@ class CategoryChoices(models.Model):
             max_length=100,
             unique = True
         )
+        slug = AutoSlugField(
+        populate_from='title',
+        unique=True,
+        editable=True,
+        verbose_name='слаг'
+        )
         def __str__(self) -> Any:
             return self.title
+        
+        def get_absolute_url(self):
+            return reverse('category_detail', kwargs={'slug': self.slug})
         
         class Meta:
             verbose_name= 'категория'

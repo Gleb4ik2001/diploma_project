@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>{{ cv.title }}</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand text-danger" href="http://localhost:8000/main-page/">HitHader</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Мои резюме</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Отклики</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Избранное</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-success font-weight-bold" href="#" id="navbarDropdown"
+                        role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ user.email }}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#" id="myProfileLink">Мой профиль</a>
+                        <a id="logoutLink" class="dropdown-item" href="#">Выйти</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        <h1>{{ cv.title }}</h1>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                {% if cv.birth_date %}
+                    <p><strong>Дата рождения:</strong> {{ cv.birth_date }}</p>
+                {% endif %}
+                {% if cv.employment_status %}
+                    <p><strong>Занятость:</strong> {{ cv.get_employment_status_display }}</p>
+                {% endif %}
+                {% if cv.category %}
+                    <p><strong>Категория:</strong> {{ cv.category }}</p>
+                {% endif %}
+                {% if cv.business_trip_readiness %}
+                    <p><strong>Готовность к командировкам:</strong> {{ cv.get_business_trip_readiness_display }}</p>
+                {% endif %}
+                {% if cv.schedule %}
+                    <p><strong>График работы:</strong> {{ cv.get_schedule_display }}</p>
+                {% endif %}
+                {% if cv.desired_salary %}
+                    <p><strong>Желаемая зарплата:</strong> {{ cv.desired_salary }} {{ cv.currency }}</p>
+                {% endif %}
+                {% if cv.phone_number %}
+                    <p><strong>Номер телефона:</strong> {{ cv.phone_number }}</p>
+                {% endif %}
+                {% if cv.job_email %}
+                    <p><strong>Почта для связи:</strong> {{ cv.job_email }}</p>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                {% if cv.citizenship %}
+                    <p><strong>Гражданство:</strong> {{ cv.get_citizenship_display }}</p>
+                {% endif %}
+                {% if cv.living_place %}
+                    <p><strong>Город проживания:</strong> {{ cv.living_place }}</p>
+                {% endif %}
+                {% if cv.education %}
+                    <p><strong>Образование:</strong> {{ cv.get_education_display }}</p>
+                {% endif %}
+                {% if cv.gender %}
+                    <p><strong>Пол:</strong> {{ cv.get_gender_display }}</p>
+                {% endif %}
+                {% if cv.family_status %}
+                    <p><strong>Семейное положение:</strong> {{ cv.get_family_status_display }}</p>
+                {% endif %}
+                {% if cv.university %}
+                    <p><strong>Университет:</strong> {{ cv.university }}</p>
+                {% endif %}
+                {% if cv.university_graduate_year %}
+                    <p><strong>Год окончания:</strong> {{ cv.university_graduate_year }}</p>
+                {% endif %}
+                {% if cv.faculty %}
+                    <p><strong>Факультет:</strong> {{ cv.faculty }}</p>
+                {% endif %}
+                {% if cv.speciality %}
+                    <p><strong>Специальность:</strong> {{ cv.speciality }}</p>
+                {% endif %}
+                {% if cv.education_form %}
+                    <p><strong>Форма обучения:</strong> {{ cv.get_education_form_display }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if cv.photo %}
+            <div class="mt-3">
+                <p><strong>Фото:</strong></p>
+                <img src="{{ cv.photo.url }}" alt="Фото">
+            </div>
+        {% endif %}
+
+        {% if cv.coursess %}
+            <div class="mt-3">
+                <p><strong>Курсы:</strong> {{ cv.coursess }}</p>
+            </div>
+        {% endif %}
+
+        {% if cv.languages.exists %}
+            <div class="mt-3">
+                <p><strong>Владение языками:</strong></p>
+                <ul>
+                    {% for language in cv.languages.all %}
+                        <li>{{ language }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

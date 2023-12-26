@@ -69,15 +69,12 @@
         .then(response => response.json())
         .then(data => {
             console.log('Success:', data);
-            alert('User registered successfully');
-            // Получаем URL перенаправления
             const redirectUrl = document.getElementById('redirectUrl').value;
-            // Перенаправляем пользователя на страницу входа
             window.location.href = redirectUrl;
         })
         .catch((error) => {
             console.error('Error:', error);
-            alert('Failed to register user');
+            alert('Попробуйте еще раз');
         });
     }
     function redirectToCompanyRegistrate(){

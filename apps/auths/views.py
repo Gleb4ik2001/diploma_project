@@ -111,3 +111,4 @@ class UserLogoutAPI(APIView):
         resp.delete_cookie('jwt')
         resp.data = {'message':"you logout"}
         return resp
+    
