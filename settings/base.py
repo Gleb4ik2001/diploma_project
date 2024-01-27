@@ -43,6 +43,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'frontend.middleware.HandleAttributeErrorMiddleware'
 ]
 
 ROOT_URLCONF = 'settings.urls'
@@ -90,17 +91,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 REST_FRAMEWORK = {
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    # ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'auths.authentication.CustomUserAuthentication'
     ],
 }
-# AUTHENTICATION_CLASSES = [
-#     'auths.authentication.CustomUserAuthentication', 
-# ]
-
 
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:8000',

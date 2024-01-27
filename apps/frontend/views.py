@@ -22,6 +22,7 @@ import jwt
 from django.views.generic import TemplateView
 from django.contrib.auth import get_user_model
 from django.http import HttpResponseBadRequest
+from .services import get_user_model_custom
 
 
 class JobSeekerRegistrateView(View):
@@ -71,18 +72,10 @@ class JobSeekerMainView(TemplateView):
     company_template_name = 'company_main.html'
 
     def get(self, request, *args, **kwargs):
-        jwt_token = request.COOKIES.get('jwt')
-
         try:
-            payload = jwt.decode(jwt_token, settings.JWT_SECRET_KEY, algorithms=['HS256'])
-            user_id = payload['id']
-        except jwt.ExpiredSignatureError:
-            return HttpResponseBadRequest('Token has expired')
-        except jwt.InvalidTokenError:
-            return HttpResponseBadRequest('Invalid token')
-        User = get_user_model()
-        user = User.objects.get(pk=user_id)
-
+            user = get_user_model_custom(request)
+        except AttributeError as ex:
+            redirect('login')
         if user.is_company:
             return render(request, self.company_template_name, {'user': user})
         else:
@@ -91,17 +84,7 @@ class JobSeekerMainView(TemplateView):
 class UserProfileView(View):
     template_name = 'me.html'
     def get(self, request,*args,**kwargs):
-        jwt_token = request.COOKIES.get('jwt')
-        try:
-            payload = jwt.decode(jwt_token, settings.JWT_SECRET_KEY, algorithms=['HS256'])
-            user_id = payload['id']
-        except jwt.ExpiredSignatureError:
-            return HttpResponseBadRequest('Token has expired')
-        except jwt.InvalidTokenError:
-            return HttpResponseBadRequest('Invalid token')
-
-        User = get_user_model()
-        user = User.objects.get(pk=user_id)
+        user = get_user_model_custom(request)
         return render(
             request=request,
             template_name=self.template_name,
@@ -118,7 +101,7 @@ class CategoryDetailView(View):
         except CategoryChoices.DoesNotExist:
             raise HttpResponse("Такой категории не существует")
         vacancys = Vacancy.objects.filter(category=category)
-        user = request.user
+        user = get_user_model_custom(request)
         context = {
             'vacancys': vacancys,
             'category':category,
@@ -131,7 +114,7 @@ class VacancyView(View):
 
     def get(self,request:HttpRequest,pk)->HttpResponse:
         vacancy = Vacancy.objects.get(id=pk)
-        user = request.user
+        user = get_user_model_custom(request)
         return render(
             request=request,
             template_name=self.template_name,
@@ -144,17 +127,7 @@ class VacancyView(View):
 class CVView(View):
     template_name ='cv.html'
     def get(self,request:HttpRequest)->HttpResponse:
-        jwt_token = request.COOKIES.get('jwt')
-        try:
-            payload = jwt.decode(jwt_token, settings.JWT_SECRET_KEY, algorithms=['HS256'])
-            user_id = payload['id']
-        except jwt.ExpiredSignatureError:
-            return HttpResponseBadRequest('Token has expired')
-        except jwt.InvalidTokenError:
-            return HttpResponseBadRequest('Invalid token')
-
-        User = get_user_model()
-        user = User.objects.get(pk=user_id)
+        user = get_user_model_custom(request)
         cvs = CurriculumVitae.objects.filter(user = user)
         return render(
             request=request,
@@ -169,17 +142,7 @@ class CVDetailView(View):
     template_name = 'cv_detail.html'
 
     def get(self,request,pk):
-        jwt_token = request.COOKIES.get('jwt')
-        try:
-            payload = jwt.decode(jwt_token, settings.JWT_SECRET_KEY, algorithms=['HS256'])
-            user_id = payload['id']
-        except jwt.ExpiredSignatureError:
-            return HttpResponseBadRequest('Token has expired')
-        except jwt.InvalidTokenError:
-            return HttpResponseBadRequest('Invalid token')
-
-        User = get_user_model()
-        user = User.objects.get(pk=user_id)
+        user = get_user_model_custom(request)
         cv = CurriculumVitae.objects.get(id=pk)
         return render(
             request=request,
@@ -196,17 +159,7 @@ class MyVacancysView(View):
     template_name = 'my_vacancys.html'
 
     def get(self,request:HttpRequest)->HttpResponse:
-        jwt_token = request.COOKIES.get('jwt')
-        try:
-            payload = jwt.decode(jwt_token, settings.JWT_SECRET_KEY, algorithms=['HS256'])
-            user_id = payload['id']
-        except jwt.ExpiredSignatureError:
-            return HttpResponseBadRequest('Token has expired')
-        except jwt.InvalidTokenError:
-            return HttpResponseBadRequest('Invalid token')
-
-        User = get_user_model()
-        user = User.objects.get(pk=user_id)
+        user = get_user_model_custom(request)
         vacancies = Vacancy.objects.filter(company=user)
         return render(
             request=request,
@@ -221,17 +174,7 @@ class MyVacancyDetailView(View):
     template_name=  'my_vacancy_detail.html'
 
     def get(self,request:HttpRequest,pk)->HttpResponse:
-        jwt_token = request.COOKIES.get('jwt')
-        try:
-            payload = jwt.decode(jwt_token, settings.JWT_SECRET_KEY, algorithms=['HS256'])
-            user_id = payload['id']
-        except jwt.ExpiredSignatureError:
-            return HttpResponseBadRequest('Token has expired')
-        except jwt.InvalidTokenError:
-            return HttpResponseBadRequest('Invalid token')
-
-        User = get_user_model()
-        user = User.objects.get(pk=user_id)
+        user = get_user_model_custom(request)
         vacancy= Vacancy.objects.get(id=pk)
         return render(
             request=request,
@@ -247,21 +190,14 @@ class MakeVacancyiew(View):
     template_name = 'make_vacancy.html'
 
     def get(self, request):
+        user = get_user_model_custom(request)
+        if user.is_company== False:
+            return HttpResponse('У вас нет прав доступа для этой страницы')
         form = VacancyForm()
         return render(request, self.template_name, {'form': form})
     
     def post(self, request):
-        jwt_token = request.COOKIES.get('jwt')
-        try:
-            payload = jwt.decode(jwt_token, settings.JWT_SECRET_KEY, algorithms=['HS256'])
-            user_id = payload['id']
-        except jwt.ExpiredSignatureError:
-            return HttpResponseBadRequest('Token has expired')
-        except jwt.InvalidTokenError:
-            return HttpResponseBadRequest('Invalid token')
-
-        User = get_user_model()
-        user = User.objects.get(pk=user_id)
+        user = get_user_model_custom(request)
         form = VacancyForm(request.POST)
         if form.is_valid():
             vacancy = form.save(commit=False)
@@ -277,21 +213,14 @@ class MakeCVView(View):
     template_name = 'make_cv.html'
 
     def get(self, request):
+        user = get_user_model_custom(request)
+        if user.is_company:
+            return HttpResponse('Компания не может создать резюме')
         form = CurriculumVitaeForm()
         return render(request, self.template_name, {'form': form})
     
     def post(self, request):
-        jwt_token = request.COOKIES.get('jwt')
-        try:
-            payload = jwt.decode(jwt_token, settings.JWT_SECRET_KEY, algorithms=['HS256'])
-            user_id = payload['id']
-        except jwt.ExpiredSignatureError:
-            return HttpResponseBadRequest('Token has expired')
-        except jwt.InvalidTokenError:
-            return HttpResponseBadRequest('Invalid token')
-
-        User = get_user_model()
-        user = User.objects.get(pk=user_id)
+        user = get_user_model_custom(request)
         form = CurriculumVitaeForm(request.POST)
         if form.is_valid():
             cv = form.save(commit=False)
@@ -302,3 +231,11 @@ class MakeCVView(View):
         else:
             messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
             return render(request, self.template_name, {'form': form})
+        
+    
+def test_fetches(request:HttpRequest)->HttpResponse:
+    return render(
+        request=request,
+        template_name='test_fetch.html',
+        context={}
+    )

@@ -14,7 +14,8 @@ from .views import (
     MakeCVView,
     MyVacancysView,
     MyVacancyDetailView,
-    MakeVacancyiew
+    MakeVacancyiew,
+    test_fetches
 )
 
 
@@ -33,7 +34,8 @@ urlpatterns = [
     path('my_vacancys/',MyVacancysView.as_view(),name='my_vacancys'),
     path('my_vacancys/<int:pk>',MyVacancyDetailView.as_view(),name='my_vacancy_detail'),
     path('make_vacancy/',MakeVacancyiew.as_view(),name='make_vacancy'),
-
+    path('make_vacancy/',MakeVacancyiew.as_view(),name='make_vacancy'),
+    path('test_fetches/',test_fetches,name='fetches')
 
 ]
 

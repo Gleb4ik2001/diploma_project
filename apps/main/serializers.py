@@ -3,7 +3,8 @@ from .models import (
     CurriculumVitae,
     Language,
     Vacancy,
-    CategoryChoices
+    CategoryChoices,
+    VacancyResponses
 )
 from auths.models import CustomUser, JobSeeker
 from rest_framework import serializers
@@ -19,6 +20,7 @@ class CurriculumVitaeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class VacancySerializer(serializers.ModelSerializer):
+    company = serializers.CharField(source='company.company_name')
     class Meta:
         model = Vacancy
         fields = '__all__'
@@ -32,3 +34,8 @@ class CategoryChoicesSerializer(serializers.ModelSerializer):
     class Meta:
         model = CategoryChoices
         fields = '__all__'
+
+class VacancyResponsesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VacancyResponses
+        fields ='__all__'

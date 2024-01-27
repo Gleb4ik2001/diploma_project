@@ -56,48 +56,45 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-        // Выполнение GET-запроса к API
-        fetch('http://localhost:8000/main/api/categorys/', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        })
-        .then(response => {
-            console.log(response);  // Добавьте эту строку для отладки
-            return response.json();
-        })
-        .then(data => {
-            console.log(data);  // Добавьте эту строку для отладки
+            fetch('http://localhost:8000/main/api/categorys/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials:"include"
+            })
+                .then(response => {
+                    console.log(response);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log(data);
 
-            // Ваш код для обработки данных о категориях
-            const categoriesContainer = document.getElementById('categoriesContainer');
+                    const categoriesContainer = document.getElementById('categoriesContainer');
 
-            // Генерация HTML-кода для карточек
-            let cardHTML = '<div class="row">';
-            data.forEach(item => {
-                cardHTML += `
-                    <div class="col-md-4 mb-3">
-                        <div class="card clickable" onclick="redirectToCategory(${item.id})" onmouseover="changeCursor(this)" onmouseout="resetCursor(this)">
-                            <div class="card-body">
-                                <h5 class="card-title">${item.title}</h5>
+                    let cardHTML = '<div class="row">';
+                    data.forEach(item => {
+                        cardHTML += `
+                            <div class="col-md-4 mb-3">
+                                <div class="card clickable" onclick="redirectToCategory('${item.slug}')" onmouseover="changeCursor(this)" onmouseout="resetCursor(this)">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${item.title}</h5>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                `;
-            });
-            cardHTML += '</div>';
+                        `;
+                    });
+                    cardHTML += '</div>';
 
-            // Вставка HTML-кода в контейнер
-            categoriesContainer.innerHTML = cardHTML;
-        })
-        .catch(error => console.error('Error:', error));
-    });
+                    categoriesContainer.innerHTML = cardHTML;
+                })
+                .catch(error => console.error('Error:', error));
+        });
 
-    // Функция для перенаправления на страницу категории
-    function redirectToCategory(categoryId) {
-        window.location.href = `http://localhost:8000/categorys/${categoryId}`;
-    }
+        function redirectToCategory(slug) {
+            window.location.href = `http://localhost:8000/categorys/${slug}`;
+        }
+
 
     // Функции для изменения курсора при наведении
     function changeCursor(element) {

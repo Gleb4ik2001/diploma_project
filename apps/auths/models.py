@@ -25,6 +25,7 @@ from django.utils import timezone
 from django.core import signing
 from django.contrib.auth.hashers import make_password
 
+
 class CustomUserManager(BaseUserManager):
     """Менеджер объектов пользователя"""
 
